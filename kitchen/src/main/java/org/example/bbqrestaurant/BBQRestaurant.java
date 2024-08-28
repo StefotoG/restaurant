@@ -2,50 +2,85 @@ package org.example.bbqrestaurant;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.io.OutputStream;
 
-public class BBQRestaurant {
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 
-    private ServerSocket serverSocket;
-    private Socket clientSocket;
-    private PrintWriter out;
-    private BufferedReader in;
+public class BBQRestaurant implements HttpHandler {
 
-    public void start(int port) throws IOException {
-        serverSocket = new ServerSocket(port);
-        clientSocket = serverSocket.accept();
-        out = new PrintWriter(clientSocket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
 
-        String inputLine;
-        while ((inputLine = in.readLine()) != null) {
-            if ("I AM HUNGRY, GIVE ME BBQ".equals(inputLine)) {
-                out.println("OK, WAIT");
-                // Simulate server push events
-                Executors.newSingleThreadScheduledExecutor().schedule(() -> out.println("CHICKEN READY"), 5, TimeUnit.SECONDS);
-                Executors.newSingleThreadScheduledExecutor().schedule(() -> out.println("BEEF READY"), 10, TimeUnit.SECONDS);
-                Executors.newSingleThreadScheduledExecutor().schedule(() -> out.println("LAST MONTH MAMMOTH READY"), 15, TimeUnit.SECONDS);
-            } else if ("NO THANKS".equals(inputLine)) {
-                out.println("CLOSED BYE");
-                break;
-            } else if ("I TAKE THAT!!!".equals(inputLine)) {
-                out.println("SERVED BYE");
-                break;
+        if (exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+            String requestBodyString = getRequestBodyString(exchange);
+
+            try {
+                handleRequestBody(exchange, requestBodyString);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
+        } else {
+            handleBadRequest(exchange);
         }
-
-        stop();
     }
 
-    public void stop() throws IOException {
-        in.close();
-        out.close();
-        clientSocket.close();
-        serverSocket.close();
+    private void handleRequestBody(HttpExchange exchange, String requestBodyString) throws IOException, InterruptedException {
+        if (requestBodyString.equals("I AM HUNGRY, GIVE ME BBQ")) {
+            prepareBBQ(exchange);
+        } else if (requestBodyString.equals("NO THANKS")) {
+            // Send the response
+            String response = "OK, BYE";
+            exchange.sendResponseHeaders(200, response.length());
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        } else if (requestBodyString.contains("I TAKE THAT !!!")) {
+            // Send the response
+            String response = "SERVED BYE";
+            exchange.sendResponseHeaders(200, response.length());
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        } else {
+            handleBadRequest(exchange);
+        }
+    }
+
+    private void prepareBBQ(HttpExchange exchange) throws IOException, InterruptedException {
+        // Send the response
+        String response = "OK, WAIT";
+        exchange.sendResponseHeaders(200, response.length());
+        OutputStream os = exchange.getResponseBody();
+        os.write(response.getBytes());
+        Thread.sleep(10000);
+        response = "BBQ IS READY";
+        os.write(response.getBytes());
+        os.close();
+    }
+
+    private String getRequestBodyString(HttpExchange exchange) throws IOException {
+        // Read the request body
+        InputStream requestBody = exchange.getRequestBody();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(requestBody));
+        StringBuilder requestBodyBuilder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            requestBodyBuilder.append(line);
+        }
+        String requestBodyString = requestBodyBuilder.toString();
+        return requestBodyString;
+    }
+
+    private void handleBadRequest(HttpExchange exchange) throws IOException {
+        // Send the response
+        String response = "Sorry, I don't understand your request!";
+        exchange.sendResponseHeaders(400, response.length());
+        OutputStream os = exchange.getResponseBody();
+        os.write(response.getBytes());
+        os.close();
     }
 }
