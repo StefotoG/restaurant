@@ -40,7 +40,7 @@ public class KitchenClient {
                             result.append("Error: ").append(error.getMessage());
                         }
                         latch.countDown();
-                    },
+                    },  
                     latch::countDown
             );
 
