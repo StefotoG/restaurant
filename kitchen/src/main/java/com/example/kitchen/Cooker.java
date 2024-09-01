@@ -1,14 +1,15 @@
 package com.example.kitchen;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.example.kitchen.exceptions.FailedToCookException;
 
 @Component
 public class Cooker {
+
+    @Autowired
+    Ingredients ingredients;
 
     public String cookRandomMeal() throws FailedToCookException {
         try {
@@ -21,8 +22,7 @@ public class Cooker {
     }
 
     private String getRandomMeal() {
-        List<String> ingredients = new ArrayList<>(List.of("CHICKEN READY", "BEEF READY", "LAST MONTH MAMMOTH READY"));
-        int meal = (int) (Math.random() * ingredients.size());
-        return ingredients.get(meal);
+        int meal = (int) (Math.random() * ingredients.getIngredients().size());
+        return ingredients.getIngredients().get(meal);
     }
 }
