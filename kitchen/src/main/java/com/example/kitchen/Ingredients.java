@@ -13,5 +13,4 @@ import lombok.NoArgsConstructor;
 @Component
 public class Ingredients {
     private final List<String> ingredients = new ArrayList<>(List.of("CHICKEN READY", "BEEF READY", "LAST MONTH MAMMOTH READY"));
-
 }

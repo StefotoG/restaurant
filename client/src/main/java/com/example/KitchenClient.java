@@ -16,37 +16,38 @@ public class KitchenClient {
     }
     private final WebClient webClient;
     private final CountDownLatch latch;
-    
-     public String callBakeWithWebClient() {
+
+    public String order() {
         StringBuilder result = new StringBuilder();
 
+        Flux<String> eventStream = webClient.post()
+                .uri("/api/cook")
+                .bodyValue("I AM HUNGRY, GIVE ME BBQ")
+                .retrieve()
+                .bodyToFlux(String.class)
+                .timeout(Duration.ofSeconds(10));
+
+        eventStream.subscribe(
+                event -> {
+                    System.out.println("Received event: " + event);
+                    result.append(event).append("\n");
+                },
+                error -> {
+                    if (error instanceof WebClientResponseException webClientResponseException) {
+                        result.append("Error: ").append(webClientResponseException.getResponseBodyAsString());
+                    } else {
+                        result.append("Error: ").append(error.getMessage());
+                    }
+                    latch.countDown();
+                },
+                latch::countDown
+        );
+
         try {
-            Flux<String> eventStream = webClient.post()
-                    .uri("/api/cook")
-                    .bodyValue("I AM HUNGRY, GIVE ME BBQ")
-                    .retrieve()
-                    .bodyToFlux(String.class)
-                    .timeout(Duration.ofSeconds(10));
-
-            eventStream.subscribe(
-                    event -> {
-                        System.out.println("Received event: " + event);
-                        result.append(event).append("\n");
-                    },
-                    error -> {
-                        if (error instanceof WebClientResponseException webClientResponseException) {
-                            result.append("Error: ").append(webClientResponseException.getResponseBodyAsString());
-                        } else {
-                            result.append("Error: ").append(error.getMessage());
-                        }
-                        latch.countDown();
-                    },  
-                    latch::countDown
-            );
-
             latch.await();
         } catch (InterruptedException e) {
-            return e.getMessage();
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
         return result.toString();

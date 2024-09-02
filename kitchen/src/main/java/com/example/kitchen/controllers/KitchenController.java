@@ -17,7 +17,7 @@ public class KitchenController {
     KitchenService kitchenService;
 
     @RequestMapping(value = "/api/cook", method = RequestMethod.POST)
-    public SseEmitter publisher(@RequestBody String request) {
+    public SseEmitter order(@RequestBody String request) {
         ClientCommand command = ClientCommand.fromValue(request.trim());
         return kitchenService.handleClientRequest(new KitchenRequest(command));
     }
