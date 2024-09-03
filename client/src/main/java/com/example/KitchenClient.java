@@ -29,8 +29,12 @@ public class KitchenClient {
 
         eventStream.subscribe(
                 event -> {
+                    if (event.equals("OK, WAIT")) {
+                        return;
+                    }
                     System.out.println("Received event: " + event);
                     result.append(event).append("\n");
+                    latch.countDown();
                 },
                 error -> {
                     if (error instanceof WebClientResponseException webClientResponseException) {
@@ -53,4 +57,77 @@ public class KitchenClient {
         return result.toString();
     }
 
+    void acceptOrder() {
+        Flux<String> eventStream = webClient.post()
+                .uri("/api/cook")
+                .bodyValue("I TAKE THAT!!!")
+                .retrieve()
+                .bodyToFlux(String.class)
+                .timeout(Duration.ofSeconds(10));
+
+        eventStream.subscribe(
+                event -> {
+                    if (event.equals("SERVED BYE")) {
+                        return;
+                    }
+                    System.out.println("Received event: " + event);
+                    latch.countDown();
+                },
+                error -> {
+                    if (error instanceof WebClientResponseException webClientResponseException) {
+                        System.out.println("Error: " + webClientResponseException.getResponseBodyAsString());
+                    } else {
+                        System.out.println("Error: " + error.getMessage());
+                    }
+                    latch.countDown();
+                },
+                latch::countDown
+        );
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    String cancelOrder() {
+        StringBuilder result = new StringBuilder();
+
+        Flux<String> eventStream = webClient.post()
+                .uri("/api/cook")
+                .bodyValue("NO THANKS")
+                .retrieve()
+                .bodyToFlux(String.class)
+                .timeout(Duration.ofSeconds(10));
+
+        eventStream.subscribe(
+                event -> {
+                    if (event.equals("OK, WAIT")) {
+                        return;
+                    }
+                    System.out.println("Received event: " + event);
+                    result.append(event).append("\n");
+                    latch.countDown();
+                },
+                error -> {
+                    if (error instanceof WebClientResponseException webClientResponseException) {
+                        result.append("Error: ").append(webClientResponseException.getResponseBodyAsString());
+                    } else {
+                        result.append("Error: ").append(error.getMessage());
+                    }
+                    latch.countDown();
+                },
+                latch::countDown
+        );
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return result.toString();
+    }
 }

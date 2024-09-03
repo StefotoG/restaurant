@@ -18,7 +18,7 @@ import com.example.kitchen.services.RestaurantState.RestaurantStates;
 
 @Service
 public class KitchenService {
-    private final ExecutorService bakers = Executors.newFixedThreadPool(5);
+    private final ExecutorService bakers = Executors.newFixedThreadPool(1);
 
     @Autowired
     private RestaurantState currentState;
