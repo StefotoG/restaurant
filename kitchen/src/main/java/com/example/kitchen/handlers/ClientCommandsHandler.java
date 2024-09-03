@@ -3,12 +3,13 @@ package com.example.kitchen.handlers;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.example.kitchen.Cooker;
 import com.example.kitchen.exceptions.FailedToCookException;
-import com.example.kitchen.exceptions.ResponseFailedException;
 import com.example.kitchen.services.RestaurantState;
 import com.example.kitchen.services.RestaurantState.RestaurantStates;
 
@@ -20,14 +21,13 @@ public class ClientCommandsHandler {
     @Autowired
     private RestaurantState currentState;
 
-
     public Runnable handleHungryCommand(SseEmitter emitter) {
         return () -> {
             try {
                 System.out.println("Server: client command handler hungry");
                 prepareMeal(emitter);
             } catch (IOException e) {
-                throw new ResponseFailedException("Failed to send response");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send response");
             } catch (FailedToCookException e) {
 
             }
@@ -39,18 +39,14 @@ public class ClientCommandsHandler {
             try {
                 handleServedRequest(emitter);
             } catch (IOException e) {
-                throw new ResponseFailedException("Failed to send response");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send response");
             }
         };
     }
 
     public Runnable handleInvalidCommand(SseEmitter emitter) {
         return () -> {
-            try {
-                sendResponse(emitter, "Invalid command");
-            } catch (IOException e) {
-                throw new ResponseFailedException("Failed to send response");
-            }
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid command");
         };
     }
 
@@ -59,7 +55,8 @@ public class ClientCommandsHandler {
             try {
                 closeKitchen(emitter);
             } catch (IOException e) {
-                throw new ResponseFailedException("Failed to send response");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send response");
+
             }
         };
     }

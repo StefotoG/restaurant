@@ -1,5 +1,7 @@
 package com.example.kitchen.dtos.requests;
 
+import com.example.kitchen.exceptions.InvalidCommandException;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -10,12 +12,17 @@ public enum ClientCommand {
 
     private final String value;
 
-    public static ClientCommand fromValue(String value) {
+    public static ClientCommand fromValue(String value) throws InvalidCommandException {
         for (ClientCommand command : ClientCommand.values()) {
             if (command.value.equalsIgnoreCase(value)) {
                 return command;
             }
         }
-        throw new IllegalArgumentException("Unknown command: " + value);
+        throw new InvalidCommandException("Invalid command: " + value);
     }
+
+    public String getValue() {
+        return value;
+    }
+    
 }

@@ -6,12 +6,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.example.kitchen.dtos.requests.ClientCommand;
 import com.example.kitchen.dtos.requests.KitchenRequest;
-import com.example.kitchen.exceptions.ResponseFailedException;
 import com.example.kitchen.handlers.ClientCommandsHandler;
 import com.example.kitchen.services.RestaurantState.RestaurantStates;
 
@@ -32,7 +33,7 @@ public class KitchenService {
                     try {
                         sendResponse(emitter, "OK, WAIT");
                     } catch (IOException e) {
-                        throw new ResponseFailedException("Failed to send response");
+                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send response");
                     }
                 },
                 RestaurantStates.SERVED, () -> serveMeal(request, emitter),
@@ -40,7 +41,7 @@ public class KitchenService {
                     try {
                         handleClosedBye(emitter);
                     } catch (IOException e) {
-                        throw new ResponseFailedException("Failed to send response");
+                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send response");
                     }
                 }
         );
