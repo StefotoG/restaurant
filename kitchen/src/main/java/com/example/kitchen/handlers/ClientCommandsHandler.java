@@ -27,7 +27,7 @@ public class ClientCommandsHandler {
                 System.out.println("Server: client command handler hungry");
                 prepareMeal(emitter);
             } catch (IOException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send response");
+                handleFailedResponse();
             } catch (FailedToCookException e) {
 
             }
@@ -39,7 +39,7 @@ public class ClientCommandsHandler {
             try {
                 handleServedRequest(emitter);
             } catch (IOException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send response");
+                handleFailedResponse();
             }
         };
     }
@@ -50,13 +50,17 @@ public class ClientCommandsHandler {
         };
     }
 
+    public void handleFailedResponse() throws ResponseStatusException {
+        currentState.setCurrentState(RestaurantStates.IDLE);
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send response");
+    }
+
     public Runnable handleNoThanksCommand(SseEmitter emitter) {
         return () -> {
             try {
                 closeKitchen(emitter);
             } catch (IOException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send response");
-
+                handleFailedResponse();
             }
         };
     }

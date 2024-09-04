@@ -6,9 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.example.kitchen.dtos.requests.ClientCommand;
@@ -18,6 +16,7 @@ import com.example.kitchen.services.RestaurantState.RestaurantStates;
 
 @Service
 public class KitchenService {
+
     private final ExecutorService bakers = Executors.newFixedThreadPool(1);
 
     @Autowired
@@ -33,7 +32,7 @@ public class KitchenService {
                     try {
                         sendResponse(emitter, "OK, WAIT");
                     } catch (IOException e) {
-                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send response");
+                        clientCommandsHandler.handleFailedResponse();
                     }
                 },
                 RestaurantStates.SERVED, () -> serveMeal(request, emitter),
@@ -41,7 +40,7 @@ public class KitchenService {
                     try {
                         handleClosedBye(emitter);
                     } catch (IOException e) {
-                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send response");
+                        clientCommandsHandler.handleFailedResponse();
                     }
                 }
         );
