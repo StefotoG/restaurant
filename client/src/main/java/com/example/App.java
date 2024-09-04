@@ -23,7 +23,6 @@ public class App {
                 );
 
         ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
-
         WebClient webClient = WebClient.builder()
                 .clientConnector(connector)
                 .baseUrl("http://127.0.0.1:8080").build();
@@ -31,7 +30,6 @@ public class App {
     }
 
     public static void main(String[] args) {
-        System.Logger logger = System.getLogger(App.class.getName());
         final int MENU_SIZE = 3;
         WebClient webClient = createWebClient();
         CountDownLatch latch = new CountDownLatch(1);
@@ -39,22 +37,30 @@ public class App {
         Set<String> orders = new HashSet<>();
 
         String order = kitchenClient.order();
-        logger.log(System.Logger.Level.INFO, "Received event: " + order);
 
-        while (orders.size() < MENU_SIZE) {
+        while (orders.size() < MENU_SIZE + 1) {
+            System.out.println("Received order: " + order);
             if (orders.add(order)) {
+                System.out.println("Accepted order: " + order);
                 kitchenClient.acceptOrder();
                 order = kitchenClient.order();
-                logger.log(System.Logger.Level.INFO, "accepted event: " + order);
+                latch.countDown();
             } else if (order.equals("CLOSED BYE")) {
+                System.out.println("The restaurant is closed. Goodbye!");
                 break;
             } else {
+                System.out.println("rejecting order: " + order);
                 order = kitchenClient.cancelOrder();
-                logger.log(System.Logger.Level.INFO, "canceled event: " + order);
+                latch.countDown();
+            }
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                System.err.println("Latch waiting interrupted");
             }
         }
 
-        kitchenClient.cancelOrder();
+        System.out.println("orders: " + orders);
     }
-
 }
