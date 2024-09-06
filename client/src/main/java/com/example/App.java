@@ -2,7 +2,6 @@ package com.example;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -12,6 +11,31 @@ import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.transport.ProxyProvider;
 
 public class App {
+
+    public static void main(String[] args) {
+        final int MENU_SIZE = 3;
+        WebClient webClient = createWebClient();
+        KitchenClient kitchenClient = new KitchenClient(webClient);
+        Set<String> orders = new HashSet<>();
+
+        String order = kitchenClient.order();
+
+        while (orders.size() < MENU_SIZE) {
+            System.out.println("Received order: " + order);
+            if (orders.add(order)) {
+                System.out.println("Accepted order: " + order);
+                kitchenClient.acceptOrder();
+                order = kitchenClient.order();
+            } else if (order.equals("CLOSED BYE")) {
+                System.out.println("The restaurant is closed. Goodbye!");
+                break;
+            } else {
+                System.out.println("rejecting order: " + order);
+                order = kitchenClient.cancelOrder();
+            }
+        }
+        System.out.println("orders: " + orders);
+    }
 
     private static WebClient createWebClient() {
         HttpClient httpClient = HttpClient.create(ConnectionProvider.create("client", 1))
@@ -27,40 +51,5 @@ public class App {
                 .clientConnector(connector)
                 .baseUrl("http://127.0.0.1:8080").build();
         return webClient;
-    }
-
-    public static void main(String[] args) {
-        final int MENU_SIZE = 3;
-        WebClient webClient = createWebClient();
-        CountDownLatch latch = new CountDownLatch(1);
-        KitchenClient kitchenClient = new KitchenClient(webClient, latch);
-        Set<String> orders = new HashSet<>();
-
-        String order = kitchenClient.order();
-
-        while (orders.size() < MENU_SIZE + 1) {
-            System.out.println("Received order: " + order);
-            if (orders.add(order)) {
-                System.out.println("Accepted order: " + order);
-                kitchenClient.acceptOrder();
-                order = kitchenClient.order();
-                latch.countDown();
-            } else if (order.equals("CLOSED BYE")) {
-                System.out.println("The restaurant is closed. Goodbye!");
-                break;
-            } else {
-                System.out.println("rejecting order: " + order);
-                order = kitchenClient.cancelOrder();
-                latch.countDown();
-            }
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.err.println("Latch waiting interrupted");
-            }
-        }
-
-        System.out.println("orders: " + orders);
     }
 }
