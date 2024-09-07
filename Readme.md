@@ -53,7 +53,7 @@ The communication between the client and server is routed through a Squid proxy,
 
 ## Prerequisites
 
-- Java 11 or higher
+- Java 17 or higher
 - Maven 3.6.0 or higher
 
 ## Installation

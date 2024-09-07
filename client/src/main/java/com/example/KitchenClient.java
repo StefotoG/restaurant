@@ -1,18 +1,43 @@
 package com.example;
 
 import java.time.Duration;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 public class KitchenClient {
+    private static final int MENU_SIZE = 3;
+    private final WebClient webClient;
+
     public KitchenClient(WebClient webClient) {
         this.webClient = webClient;
     }
-    private final WebClient webClient;
 
-    public String order() {
+    public Set<String> processOrders() {
+        String order = order();
+
+        Set<String> orders = new HashSet<>();
+        while (orders.size() < MENU_SIZE) {
+            System.out.println("Received order: " + order);
+            if (orders.add(order)) {
+                System.out.println("Accepted order: " + order);
+                acceptOrder();
+                order = order();
+            } else if (order.equals("CLOSED BYE")) {
+                System.out.println("The restaurant is closed. Goodbye!");
+                break;
+            } else {
+                System.out.println("rejecting order: " + order);
+                order = cancelOrder();
+            }
+        }
+        return orders;
+    }
+
+    private String order() {
         StringBuilder result = new StringBuilder();
 
         webClient.post()
@@ -27,7 +52,7 @@ public class KitchenClient {
         return result.toString();
     }
 
-    void acceptOrder() {
+    private void acceptOrder() {
         webClient.post()
                 .uri("/api/cook")
                 .bodyValue("I TAKE THAT!!!")
@@ -38,7 +63,7 @@ public class KitchenClient {
                 .blockLast(Duration.ofSeconds(10));
     }
 
-    String cancelOrder() {
+    private String cancelOrder() {
         StringBuilder result = new StringBuilder();
 
         webClient.post()
