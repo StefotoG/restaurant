@@ -24,6 +24,11 @@ public class KitchenService {
     @Autowired
     private ClientCommandsHandler clientCommandsHandler;
 
+    KitchenService(RestaurantState currentState, ClientCommandsHandler clientCommandsHandler) {
+        this.currentState = currentState;
+        this.clientCommandsHandler = clientCommandsHandler;
+    }
+
     public SseEmitter handleClientRequest(KitchenRequest request) {
         SseEmitter emitter = new SseEmitter(5000L);
         Map<RestaurantStates, Runnable> stateHandlers = Map.of(

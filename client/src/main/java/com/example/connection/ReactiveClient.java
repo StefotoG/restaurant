@@ -1,4 +1,4 @@
-package com.example;
+package com.example.connection;
 
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -12,7 +12,7 @@ public class ReactiveClient {
     private static final int PORT = 8080;
     private static final int PROXY_PORT = 3128;
     private static final int MAX_CONNECTIONS = 1;
-    
+
     public WebClient create() {
         HttpClient httpClient = HttpClient.create(ConnectionProvider.create("client", MAX_CONNECTIONS))
                 .proxy(proxy -> proxy

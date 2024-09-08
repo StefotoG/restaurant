@@ -21,15 +21,18 @@ public class ClientCommandsHandler {
     @Autowired
     private RestaurantState currentState;
 
+    ClientCommandsHandler(Cooker cooker, RestaurantState currentState) {
+        this.cooker = cooker;
+        this.currentState = currentState;
+    }
+
     public Runnable handleHungryCommand(SseEmitter emitter) {
         return () -> {
             try {
                 System.out.println("Server: client command handler hungry");
                 prepareMeal(emitter);
-            } catch (IOException e) {
+            } catch (IOException | FailedToCookException e) {
                 handleFailedResponse();
-            } catch (FailedToCookException e) {
-
             }
         };
     }
@@ -46,6 +49,7 @@ public class ClientCommandsHandler {
 
     public Runnable handleInvalidCommand(SseEmitter emitter) {
         return () -> {
+            currentState.setCurrentState(RestaurantStates.IDLE);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid command");
         };
     }
@@ -81,7 +85,7 @@ public class ClientCommandsHandler {
     }
 
     private void handleServedRequest(SseEmitter emitter) throws IOException {
-        currentState.setCurrentState(RestaurantStates.IDLE); // Reset to IDLE after serving
+        currentState.setCurrentState(RestaurantStates.IDLE);
         sendResponse(emitter, "SERVED BYE");
     }
 

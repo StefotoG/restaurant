@@ -4,6 +4,8 @@ import java.util.Set;
 
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.example.connection.ReactiveClient;
+
 public class App {
     public static void main(String[] args) {
         ReactiveClient reactiveClient = new ReactiveClient();

@@ -1,4 +1,4 @@
-package com.example.controllers;
+package com.example.kitchen.controllers;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,7 +22,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.kitchen.controllers.KitchenController;
 import com.example.kitchen.dtos.requests.ClientCommand;
 import com.example.kitchen.dtos.requests.KitchenRequest;
 import com.example.kitchen.services.KitchenService;

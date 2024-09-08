@@ -18,14 +18,12 @@ public class KitchenClient {
 
     public Set<String> processOrders() {
         String order = order();
-
         Set<String> orders = new HashSet<>();
+
         while (orders.size() < MENU_SIZE) {
             System.out.println("Received order: " + order);
             if (orders.add(order)) {
-                System.out.println("Accepted order: " + order);
-                acceptOrder();
-                order = order();
+                order = acceptAndOrder(order);
             } else if (order.equals("CLOSED BYE")) {
                 System.out.println("The restaurant is closed. Goodbye!");
                 break;
@@ -35,6 +33,13 @@ public class KitchenClient {
             }
         }
         return orders;
+    }
+
+    private String acceptAndOrder(String order) {
+        System.out.println("Accepted order: " + order);
+        acceptOrder();
+        order = order();
+        return order;
     }
 
     private String order() {
