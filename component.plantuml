@@ -1,0 +1,11 @@
+@startuml component
+
+package "com.example.kitchen" {
+    [KitchenApplication] --> [KitchenService]
+    [KitchenService] --> [ClientCommandsHandler]
+    [KitchenService] --> [RestaurantState]
+    [KitchenService] --> [KitchenRequest]
+    [ClientCommandsHandler] --> [ClientCommand]
+}
+
+@enduml
