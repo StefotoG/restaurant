@@ -1,0 +1,23 @@
+@startuml usecase
+
+actor Client
+actor Chef
+
+package "Kitchen System" {
+    usecase "Place Order" as UC1
+    usecase "Cook Meal" as UC2
+    usecase "Handle Client Request" as UC3
+    usecase "Update Restaurant State" as UC4
+    usecase "Manage Ingredients" as UC5
+}
+
+Client --> UC1
+UC1 --> UC3
+UC3 --> UC2
+UC2 --> UC5
+UC3 --> UC4
+
+Chef --> UC2
+Chef --> UC5
+
+@enduml

@@ -141,3 +141,9 @@ public class App {
 ## Component Diagram
 
 ![component](https://www.plantuml.com/plantuml/svg/VP31QiOW48JlFeNadZn2ISYbq5jowA5us9gbbQYnPWs5dxpxBxyW62GU17U-MOVfTm9FmMZcGAxmWxoHc-dm7upJsAsAv2_QXZyOZ-Vh8xq7vxIIG6gpWhVjMnPcz8UIA19z6IPor0ejZPinO9VzFLuQ_PrXmfWnUB0q4z3DxZoSy2z4KoBh7zR227QoUWtoXUKM1kToDf2a3anxH2ddF8LwiIJm4xyBg3JMApvPZtO9HZy1 "component")
+
+
+## Use case Diagram
+
+
+![use-case](https://www.plantuml.com/plantuml/svg/LP3DQiD038JlUWhXUmxDpxK4V6afeQKX3o1srIHulNPNsaCfVVVAHOQkOM2a-V0EEefIqJeceA1JmJxTEUiwtFW3OAOmq9MnUxbhk776yvSeZnr-0zfNXGE9nM-90kDhYLmw9C5B_z02_JGDU69A7c_R-8boJEmDy9q_AuiwkclHonn9sHXHgeKCFwij7Dwty8doKlyvNml7vT_Yt05-0FovpURnhx39_GvCxhTWSd_ujzy3B3TQAHySEtAETjXV "use-case")
