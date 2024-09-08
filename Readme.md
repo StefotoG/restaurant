@@ -133,3 +133,7 @@ public class App {
     }
 }
 ```
+
+## Sequence Diagram
+
+![sequence](https://www.plantuml.com/plantuml/svg/TPB1QiCm38RlVWgnKyhO2uHHMdeQOmoQmywU_TEQER9dEnrx--742qxQdcpB__TBIDh594CQUaiHtmDOGKYLNA23DU0an7JIqvRsthVKIyFD9clCHIRae11xxxFWY36C2Mc9yREArUJovww92f09DVY1py8ijPcU_ofGumRwd-xL97K6roKlGisCL1Ki5FUiV70ACRu7ZH2RQxf3k1W58QnpdWPEnfAqbdf86qa6a7Bk2reGqTAxIbPCMZfBrhOqufWd6LDJDEMvgOqAbvqEEKjensn7oThrRv2scUHpqPDgZ4tNZBxmAK3dbB6b4rBrBdpL-yhXkeXLx-RAetSS8S2w7kEwWrVT6LUrGthkKZ1ysf8Rft33OpN3xZScz7buXfFbvc42MtgWnsAoMAXn_NTWFVJs3m00 "sequence")

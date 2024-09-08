@@ -1,0 +1,37 @@
+@startuml sequence
+actor Client
+
+Client -> App: main()
+activate App
+
+App -> ReactiveClient: new ReactiveClient()
+activate ReactiveClient
+
+App -> ReactiveClient: create()
+activate WebClient
+ReactiveClient -> WebClient: create()
+deactivate WebClient
+
+App -> KitchenClient: new KitchenClient(WebClient)
+activate KitchenClient
+
+App -> KitchenClient: processOrders()
+activate KitchenService
+
+loop until all meals are cooked
+    KitchenClient -> KitchenService: handleClientRequest(KitchenRequest)
+    KitchenService -> Cooker: cookRandomMeal()
+    activate Cooker
+    Cooker -> Ingredients: getIngredients()
+    deactivate Cooker
+    KitchenService -> KitchenClient: KitchenResponse
+end
+deactivate KitchenService
+
+KitchenClient -> App: Set<String> orders
+deactivate KitchenClient
+
+App -> System: println("orders: " + orders)
+deactivate App
+
+@enduml
